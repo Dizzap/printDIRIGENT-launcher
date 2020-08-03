@@ -1,2 +1,3 @@
+# VÝVOJ POZASTAVEN / DEVELOPEMENT SUSPENDED
 # printDIRIGENT-launcher
-Launcher k ERP systému printDIRIGENT. Vývoj pozastaven.
+Launcher k ERP systému printDIRIGENT.
