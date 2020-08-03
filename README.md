@@ -1,2 +1,2 @@
 # printDIRIGENT-launcher
-Launcher k ERP systému printDIRIGENT.
+Launcher k ERP systému printDIRIGENT. Vývoj pozastaven.
