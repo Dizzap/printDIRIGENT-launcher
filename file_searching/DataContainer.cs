@@ -49,6 +49,20 @@ namespace file_searching {
         public static string FileName = @"\PrintDIRIGENT2015aa";
         public static string[] exts = {".accdb", ".accde"};
         public static string test;
-       
+        public static Dictionary<string, string> reportMessages = new Dictionary<string, string>() {
+            {"Start","Spouštím..."},
+            {"LocalMissing",""},
+            {"ServerConnectionError","Nelze vytvořit připojení k serveru, jste připojeni k síti?"},
+            {"RemoteMissing",""},
+            {"VersionCheck", "Zjišťování verzí..."},
+            {"TotalError","V programu nastala zásadní chyba, prosím restartujte počítač a zkuste to znovu. \n\nPokud se vám tato informace zobrazuje opakovaně, kontaktujte prosím správce."},
+            {"SystemError","Systémová chyba."},
+            {"ServerError","Serverová chyba."},
+            {"ServerErrorRepeated","Spojení se serverem nefunguje, přejete si spustit předchozí verzi?"},
+            {"NewVersion","Nová verze k dispozici, stahuji..."},
+            {"ClientFileError","Chyba souboru na straně klienta."},
+            {"Repair","Probíhá oprava..."},
+            {"OK","Vše OK."}
+        };
     }
 }
