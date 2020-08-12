@@ -29,7 +29,7 @@ namespace file_searching
 
         List<string> reportQueue = new List<string>();
 
-        int a=0;
+        //int a=0;
 
         public Form1() {
             InitializeComponent();
@@ -94,29 +94,24 @@ namespace file_searching
                     return 0; /// síť je v pořádku
                 }
                 catch {
-                   
-                    //string message = "Nelze vytvořit připojení k serveru, jste připojeni k síti?";
                     string message = DataContainer.reportMessages["ServerConnectionError"];
                     string caption = "Server";
                     //MessageBoxButtons buttons = MessageBoxButtons.OK;
                     DialogResult result;
                     result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo);
 
-                    if (result == System.Windows.Forms.DialogResult.Yes)
-                    {
+                    if (result == System.Windows.Forms.DialogResult.Yes) {
                         //zadání cesty
                         AddressInputBox ai = new AddressInputBox();
                         ai.ShowDialog();
 
-                        try
-                        {
+                        try {
                             StreamReader conf = new StreamReader(DataContainer.remoteConfigFileAddress);
                             DataContainer.remoteDataFolder = conf.ReadLine();
                             conf.Close();
                             return 0;
                         }
-                        catch
-                        {
+                        catch {
                             ///credential test
                             Process.Start(DataContainer.serverAddress);
                             string message2 = "Jsou údaje úspěšně zadány?";
@@ -125,22 +120,18 @@ namespace file_searching
 
                             result2 = MessageBox.Show(message2, caption2, MessageBoxButtons.YesNo);
 
-                            if (result == System.Windows.Forms.DialogResult.Yes)
-                            {
-                                try
-                                { ///test sítě
+                            if (result == System.Windows.Forms.DialogResult.Yes) {
+                                try { ///test sítě
                                     StreamReader conf = new StreamReader(DataContainer.remoteConfigFileAddress);
                                     DataContainer.remoteDataFolder = conf.ReadLine();
                                     conf.Close();
                                     return 0;
                                 }
-                                catch
-                                {
-                                    MessageBox.Show("Kontaktujte správce", "Chyba"); ///kritická chyba
+                                catch {
+                                    MessageBox.Show("Kontaktujte správce.", "Chyba"); ///kritická chyba
                                 }
                             }
-                            else
-                            {
+                            else {
                                 return -99; ///storno
                             }
                         }
@@ -164,27 +155,9 @@ namespace file_searching
             lastLaunch = Convert.ToDateTime(sr.ReadLine());
             return lastLaunch;
         }*/
-        void MainCode() {                      
-            
-            if (!Directory.Exists(DataContainer.userPath + @"\pDClient")) {
-                DirectoryInfo di = Directory.CreateDirectory(DataContainer.userPath + @"\pDClient");
-                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
-            }
-            if (!Directory.Exists(DataContainer.localConfigFolder)) {
-                DirectoryInfo di2 = Directory.CreateDirectory(DataContainer.userPath + @"\pDClient\pConf");
-                di2.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
-            }
-
-            if (!Directory.Exists(DataContainer.userPath + @"\pDClient\pData")) {
-                DirectoryInfo di3 = Directory.CreateDirectory(DataContainer.userPath + @"\pDClient\pData");
-                di3.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
-            }
-            
-            if (!File.Exists(DataContainer.localConfigFolder + @"\pVerManifest.meh")) {
-                File.Create(DataContainer.localConfigFolder + @"\pVerManifest.meh").Close();
-            }
-            DataContainer.localDataFolder = DataContainer.userPath + @"\pDClient\pData";
-            
+        void MainCode() {
+            directoryChecks();            
+            DataContainer.localDataFolder = DataContainer.userPath + @"\pDClient\pData";            
 
             try {
                 DataContainer.remoteConfigFileAddress = DataContainer.remoteConfigFolder + @"\setting.meh"; //test
@@ -303,23 +276,39 @@ namespace file_searching
                 }
             }
         }
+
+        private void directoryChecks() {
+            if (!Directory.Exists(DataContainer.userPath + @"\pDClient")) {
+                DirectoryInfo di = Directory.CreateDirectory(DataContainer.userPath + @"\pDClient");
+                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
+            if (!Directory.Exists(DataContainer.localConfigFolder)) {
+                DirectoryInfo di2 = Directory.CreateDirectory(DataContainer.userPath + @"\pDClient\pConf");
+                di2.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
+
+            if (!Directory.Exists(DataContainer.userPath + @"\pDClient\pData")) {
+                DirectoryInfo di3 = Directory.CreateDirectory(DataContainer.userPath + @"\pDClient\pData");
+                di3.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
+
+            if (!File.Exists(DataContainer.localConfigFolder + @"\pVerManifest.meh")) {
+                File.Create(DataContainer.localConfigFolder + @"\pVerManifest.meh").Close();
+            }
+        }
         void Launch() {
             switch (DataContainer.RTL[2]) {
                     case (true):
                         if (DataContainer.RTL[1] == true) {
                             if (DataContainer.RTL[0] == true) {
                                 MessageBox.Show(DataContainer.reportMessages["TotalError"], "Chyba");
-                                //que[arraynum] = "Systémová chyba.";
-                                //arraynum++;
                                 reportQueue.Add(DataContainer.reportMessages["SystemError"]);
                                 //error + vypnutí, asi i tlačítko
                             }
                             else {
                                 //MessageBox.Show("While update: Only remote missing");
                                 //modál s Y/N, zapni lokál
-                                try {
-                                    //que[arraynum] = "Serverová chyba.";
-                                    //arraynum++;
+                                try {                                   
                                     reportQueue.Add(DataContainer.reportMessages["ServerError"]);
                                     string message = DataContainer.reportMessages["ServerErrorRepeated"];
                                     string caption = DataContainer.reportMessages["ServerError"];
@@ -328,8 +317,6 @@ namespace file_searching
                                     result = MessageBox.Show(message, caption, buttons);
 
                                     if (result == System.Windows.Forms.DialogResult.Yes) {
-                                        //que[arraynum] = "Spouštím...";
-                                        //arraynum++;
                                         reportQueue.Add(DataContainer.reportMessages["Start"]);
                                         Task.Delay(1000).ContinueWith(t => Process.Start(DataContainer.oldLocalFile));
 
@@ -340,9 +327,9 @@ namespace file_searching
                                 }
                                 catch (Exception ex) {
                                     MessageBox.Show(Convert.ToString(ex));
-                                    sw.WriteLine(Environment.UserName + " " + DateTime.Now + ": " + Convert.ToString(ex));
-                                    sw.WriteLine(Environment.UserName + " " + DateTime.Now + ": update_remoteNotPresent_oldLaunchFailed");
-                                }
+                                    ///zápis výjimky do logu
+                                    writeLog(ex, "update_remoteNotPresent_oldLaunchFailed", sw);
+                                 }
                                 finally { }
                             }
                         }
@@ -350,22 +337,16 @@ namespace file_searching
                             //MessageBox.Show("While update: Remote not missing");
                             //cool, stáhni to, spusť
                             try {
-                                //que[arraynum] = "Nová verze k dispozici, stahuji...";
-                                //arraynum++;
-                                reportQueue.Add(DataContainer.reportMessages["NewVersion"]);
+                                reportQueue.Add(DataContainer.reportMessages["NewVersion"]); ///přidání textace do fronty
                                 //File.Copy(DataContainer.oldLocalFile, DataContainer.localFolder + @"\backup\" + Path.GetFileName(DataContainer.oldLocalFile), true);
                                 File.Copy(DataContainer.remoteFile, DataContainer.newLocalFile, true);
-                                //que[arraynum] = "Spouštím...";
-                                //arraynum++;
                                 reportQueue.Add(DataContainer.reportMessages["Start"]);
                                 Task.Delay(1000).ContinueWith(t => Process.Start(DataContainer.newLocalFile));
                                 File.Copy(DataContainer.remoteConfigFolder + @"\pVerManifest.meh", DataContainer.localConfigFolder + @"\pVerManifest.meh", true);
-
                             }
                             catch (Exception ex) {
                                 MessageBox.Show(Convert.ToString(ex));
-                                sw.WriteLine(Environment.UserName + " " + DateTime.Now + ": " + Convert.ToString(ex));
-                                sw.WriteLine(Environment.UserName + " " + DateTime.Now + ": update_remotePresent_download/launchFailed");
+                                writeLog(ex, "update_remotePresent_download/launchFailed", sw);
                             }
                             finally {
                                 sw.Close();
@@ -376,52 +357,34 @@ namespace file_searching
                         if (DataContainer.RTL[0] == true) {
                             if (DataContainer.RTL[1] == true) {
                                 MessageBox.Show(DataContainer.reportMessages["TotalError"], "Chyba");
-                               // que[arraynum] = "Systémová chyba.";
-                                //arraynum++;
                                 reportQueue.Add(DataContainer.reportMessages["SystemError"]);
                             }
                             else {
                                 try {
-                                   // que[arraynum] = "Chyba souboru na straně klienta.";
-                                   // arraynum++;
                                     reportQueue.Add(DataContainer.reportMessages["ClientFileError"]);
                                     //sw.WriteLine(Environment.UserName + " " + DateTime.Now + ": case 2 (Before Down)");
-                                   // que[arraynum] = "Probíhá oprava...";
-                                    //arraynum++;
                                     reportQueue.Add(DataContainer.reportMessages["Repair"]);
                                     File.Copy(DataContainer.remoteFile, DataContainer.newLocalFile, true);
-                                  //  que[arraynum] = "Spouštím...";
-                                    //arraynum++;
                                     reportQueue.Add(DataContainer.reportMessages["Start"]);
                                     Task.Delay(1000).ContinueWith(t => Process.Start(DataContainer.newLocalFile));
                                 }
                                 catch (Exception ex) {
                                     MessageBox.Show(Convert.ToString(ex));
-                                    //sw.WriteLine(Environment.UserName + " " + DateTime.Now + ": " + Convert.ToString(ex));
-                                    sw.WriteLine("{0} {1}: {2}", Environment.UserName, DateTime.Now, Convert.ToString(ex));                                
-                                    //sw.WriteLine(Environment.UserName + " " + DateTime.Now + ": noUpdate_localNotPresent_launch/downloadFailed");
-                                    sw.WriteLine("{0} {1}: noUpdate_localNotPresent_launch/downloadFailed", Environment.UserName, DateTime.Now);                            
-                                }
+                                    writeLog(ex, "noUpdate_localNotPresent_launch/downloadFailed", sw);
+                                  }
                                 finally { sw.Close(); }
                             }
                         }
                         else {
                             try {
-                                //que[arraynum] = "Vše OK.";
-                                //arraynum++;
                                 reportQueue.Add(DataContainer.reportMessages["OK"]);
-                               // que[arraynum] = "Spouštím...";
-                                //arraynum++;
                                 reportQueue.Add(DataContainer.reportMessages["Start"]);
                                 Task.Delay(1000).ContinueWith(t => Process.Start(DataContainer.oldLocalFile));
                             }
                             catch (Exception ex) {
                                 MessageBox.Show(Convert.ToString(ex));
-                                //sw.WriteLine(Environment.UserName + " " + DateTime.Now + ": " + Convert.ToString(ex));
-                                sw.WriteLine("{0} {1}: {2}",Environment.UserName, DateTime.Now, Convert.ToString(ex));
-                                //sw.WriteLine(Environment.UserName + " " + DateTime.Now + ": noUpdate_localPresent_launchFailed");
-                                sw.WriteLine("{0} {1}: noUpdate_localPresent_launchFailed", Environment.UserName, DateTime.Now);
-                            }
+                                writeLog(ex, "noUpdate_localPresent_launchFailed", sw);
+                              }
                             finally {
                                 sw.Close();
                             }
@@ -431,6 +394,11 @@ namespace file_searching
                 DataContainer.RTDcode = true;
                 sw.Close();
             
+        }
+
+        private void writeLog(Exception ex, string comment, StreamWriter sw) {
+            sw.WriteLine("{0} {1}: {2}", Environment.UserName, DateTime.Now, Convert.ToString(ex));
+            sw.WriteLine("{0} {1}: {2}", Environment.UserName, DateTime.Now, comment); //proč 2x?
         }       
         private void timer2_Tick(object sender, EventArgs e) {
             /*if (a <= arraynum && que[a] != null) {
@@ -460,14 +428,12 @@ namespace file_searching
             if((DataContainer.RTDtimer == true) && (DataContainer.RTDcode == true) && (DataContainer.RTDmodal == true))
                 Task.Delay(2000).ContinueWith(t => Application.Exit());
         }
-
         private void label2_Click(object sender, EventArgs e) {
-
+            //?
         }
         private void label3_Click(object sender, EventArgs e) {
-           
+           //?
         }
-
         private void Form1_KeyDown(object sender, KeyEventArgs e) {
             
             if (e.KeyCode == Keys.R && e.Control) {

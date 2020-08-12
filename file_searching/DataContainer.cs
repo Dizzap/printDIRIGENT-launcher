@@ -48,7 +48,7 @@ namespace file_searching {
 
         public static string FileName = @"\PrintDIRIGENT2015aa";
         public static string[] exts = {".accdb", ".accde"};
-        public static string test;
+        //public static string test;
         public static Dictionary<string, string> reportMessages = new Dictionary<string, string>() {
             {"Start","Spouštím..."},
             {"LocalMissing",""},
